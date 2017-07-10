@@ -38,7 +38,7 @@ export class WebhookServer {
             }
 
             return res.json({
-                 sppech: "just another test", 
+                 speech: "just another test", 
                  displayText:  "just another test", 
                  source: "shc-webhook"
             })
