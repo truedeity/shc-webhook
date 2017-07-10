@@ -25,8 +25,8 @@ var WebhookServer = (function () {
                 }
             }
             return res.json({
-                sppech: "test",
-                displayText: "test",
+                sppech: "just another test",
+                displayText: "just another test",
                 source: "shc-webhook"
             });
         });
