@@ -34,6 +34,7 @@ var WebhookServer = (function () {
     };
     WebhookServer.prototype.startSocketIO = function () {
         var _this = this;
+        server.listen(3000);
         io.on("connect", function (socket) {
             _this.activeSocket = socket;
         });

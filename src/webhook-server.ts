@@ -16,8 +16,12 @@ export class WebhookServer {
     constructor() {
         
         this.startRestService() ;
+        
+        
+
         this.startSocketIO(); 
 
+        
     }
 
     startRestService() {
@@ -51,6 +55,8 @@ export class WebhookServer {
 
     startSocketIO() {
 
+        server.listen(3000);
+        
         io.on("connect", socket=> {
             this.activeSocket = socket;
         })
