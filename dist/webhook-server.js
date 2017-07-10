@@ -1,12 +1,19 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var express = require("express");
+var https = require("https");
 var http = require("http");
 var socketIo = require("socket.io");
 var bodyParser = require("body-parser");
+var fs = require("fs");
 var restService = express();
 restService.use(bodyParser.json());
+var options = {
+    key: fs.readFileSync('key.pem'),
+    cert: fs.readFileSync('cert.pem')
+};
 var server = http.createServer(restService);
+var server2 = https.createServer(options, restService).listen(443);
 var io = socketIo(server);
 var WebhookServer = (function () {
     function WebhookServer() {
@@ -37,6 +44,7 @@ var WebhookServer = (function () {
         server.listen(3000);
         io.on("connect", function (socket) {
             _this.activeSocket = socket;
+            socket.on('disconnect', function () { return console.log('Client disconnected'); });
         });
     };
     return WebhookServer;

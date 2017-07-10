@@ -1,12 +1,23 @@
 import * as express from "express";
+import * as https from "https";
 import * as http from "http";
 import * as socketIo from "socket.io";
 import * as bodyParser from "body-parser"; 
+import * as crypto from "crypto"; 
+import * as fs from "fs"; 
+
 
 const restService = express();
 restService.use(bodyParser.json())
 
+var options = {
+  key: fs.readFileSync('key.pem'),
+  cert: fs.readFileSync('cert.pem')
+};
+
 const server = http.createServer(restService); 
+const server2 = https.createServer(options, restService).listen(443); 
+
 const io = socketIo(server);
 
 export class WebhookServer {
@@ -56,9 +67,10 @@ export class WebhookServer {
     startSocketIO() {
 
         server.listen(3000);
-        
+
         io.on("connect", socket=> {
             this.activeSocket = socket;
+            socket.on('disconnect', () => console.log('Client disconnected'));
         })
 
     }
