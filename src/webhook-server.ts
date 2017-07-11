@@ -10,13 +10,14 @@ import * as fs from "fs";
 const restService = express();
 restService.use(bodyParser.json())
 
-var options = {
-  key: fs.readFileSync('key.pem'),
-  cert: fs.readFileSync('cert.pem')
-};
+// var options = {
+//   key: fs.readFileSync('key.pem'),
+//   cert: fs.readFileSync('cert.cert')
+// };
 
-const server = http.createServer(restService); 
-const server2 = https.createServer(options, restService).listen(443); 
+
+const server = http.createServer(restService).listen(5000); 
+const server2 = http.createServer(restService).listen(process.env.PORT || 1337); 
 
 const io = socketIo(server);
 
@@ -36,9 +37,13 @@ export class WebhookServer {
     }
 
     startRestService() {
+
         restService.post("/hook", (req, res) => { 
 
             if(req.body) {
+
+                //if it is a welcome intent
+                //
 
                 if(this.activeSocket && this.activeSocket.connected) {
 
@@ -59,18 +64,17 @@ export class WebhookServer {
             })
         })
 
-        restService.listen(process.env.PORT || 5000, () => { console.log("Server running...")}) ; 
 
     }
 
 
     startSocketIO() {
 
-        server.listen(3000);
-
         io.on("connect", socket=> {
             this.activeSocket = socket;
             socket.on('disconnect', () => console.log('Client disconnected'));
+
+   
         })
 
     }

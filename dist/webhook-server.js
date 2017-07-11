@@ -1,19 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var express = require("express");
-var https = require("https");
 var http = require("http");
 var socketIo = require("socket.io");
 var bodyParser = require("body-parser");
-var fs = require("fs");
 var restService = express();
 restService.use(bodyParser.json());
-var options = {
-    key: fs.readFileSync('key.pem'),
-    cert: fs.readFileSync('cert.pem')
-};
-var server = http.createServer(restService);
-var server2 = https.createServer(options, restService).listen(443);
+// var options = {
+//   key: fs.readFileSync('key.pem'),
+//   cert: fs.readFileSync('cert.cert')
+// };
+var server = http.createServer(restService).listen(5000);
+var server2 = http.createServer(restService).listen(process.env.PORT || 1337);
 var io = socketIo(server);
 var WebhookServer = (function () {
     function WebhookServer() {
@@ -24,6 +22,8 @@ var WebhookServer = (function () {
         var _this = this;
         restService.post("/hook", function (req, res) {
             if (req.body) {
+                //if it is a welcome intent
+                //
                 if (_this.activeSocket && _this.activeSocket.connected) {
                     //this will broadcast the message to all connected clients
                     //we need to change this to send the message to the specific client associated with the api.ai sessionId   
@@ -37,11 +37,9 @@ var WebhookServer = (function () {
                 source: "shc-webhook"
             });
         });
-        restService.listen(process.env.PORT || 5000, function () { console.log("Server running..."); });
     };
     WebhookServer.prototype.startSocketIO = function () {
         var _this = this;
-        server.listen(3000);
         io.on("connect", function (socket) {
             _this.activeSocket = socket;
             socket.on('disconnect', function () { return console.log('Client disconnected'); });
