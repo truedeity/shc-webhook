@@ -16,7 +16,7 @@ restService.use(bodyParser.json())
 // };
 
 
-const server = http.createServer(restService).listen(80); 
+const server = http.createServer(restService).listen(5000); 
 const server2 = http.createServer(restService).listen(process.env.PORT || 1337); 
 
 const io = socketIo(server);
