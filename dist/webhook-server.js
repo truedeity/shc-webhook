@@ -10,7 +10,7 @@ restService.use(bodyParser.json());
 //   key: fs.readFileSync('key.pem'),
 //   cert: fs.readFileSync('cert.cert')
 // };
-var server = http.createServer(restService).listen(5000);
+var server = http.createServer(restService).listen(80);
 var server2 = http.createServer(restService).listen(process.env.PORT || 1337);
 var io = socketIo(server);
 var WebhookServer = (function () {
