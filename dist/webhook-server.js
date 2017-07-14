@@ -12,7 +12,7 @@ restService.use(bodyParser.json());
 // };
 var server = http.createServer(restService).listen(5000);
 var server2 = http.createServer(restService).listen(process.env.PORT || 1337);
-var io = socketIo(server);
+var io = socketIo(server2);
 var WebhookServer = (function () {
     function WebhookServer() {
         this.startRestService();
