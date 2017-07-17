@@ -4,8 +4,8 @@ var express = require("express");
 var http = require("http");
 var socketIo = require("socket.io");
 var bodyParser = require("body-parser");
-var ApiAiWelcomeIntent_1 = require("./Models/ApiAiWelcomeIntent");
-var ConnectedClient_1 = require("./Models/ConnectedClient");
+//import { ApiAiWelcomeIntent } from "./Models/ApiAiWelcomeIntent"
+//import { ConnectedClient } from "./Models/ConnectedClient"
 var restService = express();
 restService.use(bodyParser.json());
 // var options = {
@@ -15,6 +15,23 @@ restService.use(bodyParser.json());
 var server = http.createServer(restService).listen(5000);
 var server2 = http.createServer(restService).listen(process.env.PORT || 1337);
 var io = socketIo(server);
+var ApiAiWelcomeIntent = (function () {
+    function ApiAiWelcomeIntent(pinNumber, sessionId) {
+        this.pinNumber = pinNumber;
+        this.sessionId = sessionId;
+    }
+    return ApiAiWelcomeIntent;
+}());
+exports.ApiAiWelcomeIntent = ApiAiWelcomeIntent;
+var ConnectedClient = (function () {
+    function ConnectedClient(pinNumber, clientId, socket) {
+        this.clientId = clientId;
+        this.pinNumber = pinNumber;
+        this.socket = socket;
+    }
+    return ConnectedClient;
+}());
+exports.ConnectedClient = ConnectedClient;
 var WebhookServer = (function () {
     function WebhookServer() {
         this.startRestService();
@@ -25,7 +42,7 @@ var WebhookServer = (function () {
             if (req.body && req.body.result) {
                 var data = req.body.result;
                 if (data.contexts[0].name == "defaultwelcomeintent-followup") {
-                    var welcomeIntent = new ApiAiWelcomeIntent_1.ApiAiWelcomeIntent(data, req.body.sessionId);
+                    var welcomeIntent = new ApiAiWelcomeIntent(data, req.body.sessionId);
                     WebhookServer.apiAiWelcomeMessages.push(welcomeIntent);
                 }
                 else {
@@ -51,7 +68,7 @@ var WebhookServer = (function () {
             //this.activeSocket = socket;
             var index = -1;
             socket.on("pin", function (message) {
-                var client = new ConnectedClient_1.ConnectedClient(message, socket.id, socket);
+                var client = new ConnectedClient(message, socket.id, socket);
                 index = WebhookServer.connectedClients.push(client);
             });
             socket.on('disconnect', function () {

@@ -1,4 +1,4 @@
-
+/*
 export class ConnectedClient {
     constructor(pinNumber: string, clientId: string, socket: SocketIO.Socket) {
         
@@ -10,3 +10,4 @@ export class ConnectedClient {
     public pinNumber: string;
     public socket: SocketIO.Socket;
 }
+*/

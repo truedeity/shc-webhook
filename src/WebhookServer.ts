@@ -5,8 +5,8 @@ import * as socketIo from "socket.io";
 import * as bodyParser from "body-parser";
 import * as crypto from "crypto";
 import * as fs from "fs";
-import { ApiAiWelcomeIntent } from "./Models/ApiAiWelcomeIntent"
-import { ConnectedClient } from "./Models/ConnectedClient"
+//import { ApiAiWelcomeIntent } from "./Models/ApiAiWelcomeIntent"
+//import { ConnectedClient } from "./Models/ConnectedClient"
 
 
 const restService = express();
@@ -23,6 +23,32 @@ const server2 = http.createServer(restService).listen(process.env.PORT || 1337);
 
 const io = socketIo(server);
 
+
+export class ApiAiWelcomeIntent {
+    
+    constructor(pinNumber: string, sessionId: string) {
+        
+        this.pinNumber = pinNumber;
+        this.sessionId = sessionId;
+
+    }
+
+    public sessionId: string;
+    public pinNumber: string; 
+
+}
+
+export class ConnectedClient {
+    constructor(pinNumber: string, clientId: string, socket: SocketIO.Socket) {
+        
+        this.clientId = clientId;
+        this.pinNumber = pinNumber;
+        this.socket = socket;
+    }
+    public clientId: string;
+    public pinNumber: string;
+    public socket: SocketIO.Socket;
+}
 
 
 export class WebhookServer {

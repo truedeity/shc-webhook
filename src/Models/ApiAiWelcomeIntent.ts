@@ -1,4 +1,4 @@
-
+/*
 export class ApiAiWelcomeIntent {
     
     constructor(pinNumber: string, sessionId: string) {
@@ -12,3 +12,4 @@ export class ApiAiWelcomeIntent {
     public pinNumber: string; 
 
 }
+*/
