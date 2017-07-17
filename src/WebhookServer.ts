@@ -54,14 +54,16 @@ export class ConnectedClient {
 export class WebhookServer {
 
     //private activeSocket :SocketIO.Socket; 
-    private static apiAiWelcomeMessages: ApiAiWelcomeIntent[];
-    private static connectedClients: ConnectedClient[];
+    private static apiAiWelcomeMessages: Array<ApiAiWelcomeIntent> = [];
+    private static connectedClients: Array<ConnectedClient> = [];
 
 
     constructor() {
 
         this.startRestService();
         this.startSocketIO();
+
+        
 
     }
 

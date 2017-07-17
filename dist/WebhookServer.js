@@ -76,6 +76,9 @@ var WebhookServer = (function () {
             });
         });
     };
+    //private activeSocket :SocketIO.Socket; 
+    WebhookServer.apiAiWelcomeMessages = [];
+    WebhookServer.connectedClients = [];
     return WebhookServer;
 }());
 exports.WebhookServer = WebhookServer;
