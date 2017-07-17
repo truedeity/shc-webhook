@@ -21,7 +21,7 @@ restService.use(bodyParser.json())
 const server = http.createServer(restService).listen(5000);
 const server2 = http.createServer(restService).listen(process.env.PORT || 1337);
 
-const io = socketIo(server);
+const io = socketIo(server2);
 
 
 export class ApiAiWelcomeIntent {
@@ -93,7 +93,7 @@ export class WebhookServer {
 
                         if (client && client.socket && client.socket.connected) {
 
-                            client.socket[client.clientId].emit("api-ai-message", JSON.stringify(req.body));
+                            client.socket.emit("api-ai-message", JSON.stringify(req.body));
 
                         }
 
@@ -120,6 +120,8 @@ export class WebhookServer {
             var index: number = -1;
 
             socket.on("pin", (message) => {
+
+                console.log("pin");
 
                 var client = new ConnectedClient(message, socket.id, socket);
                 index = WebhookServer.connectedClients.push(client);

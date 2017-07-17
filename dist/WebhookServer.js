@@ -14,7 +14,7 @@ restService.use(bodyParser.json());
 // };
 var server = http.createServer(restService).listen(5000);
 var server2 = http.createServer(restService).listen(process.env.PORT || 1337);
-var io = socketIo(server);
+var io = socketIo(server2);
 var ApiAiWelcomeIntent = (function () {
     function ApiAiWelcomeIntent(pinNumber, sessionId) {
         this.pinNumber = pinNumber;
@@ -51,7 +51,7 @@ var WebhookServer = (function () {
                     if (welcomeMessage && welcomeMessage.pinNumber) {
                         var client = WebhookServer.connectedClients.find(function (s) { return s.pinNumber == welcomeMessage.pinNumber; });
                         if (client && client.socket && client.socket.connected) {
-                            client.socket[client.clientId].emit("api-ai-message", JSON.stringify(req.body));
+                            client.socket.emit("api-ai-message", JSON.stringify(req.body));
                         }
                     }
                 }
@@ -68,6 +68,7 @@ var WebhookServer = (function () {
             //this.activeSocket = socket;
             var index = -1;
             socket.on("pin", function (message) {
+                console.log("pin");
                 var client = new ConnectedClient(message, socket.id, socket);
                 index = WebhookServer.connectedClients.push(client);
                 socket.emit("pin-accepted", socket.id);
