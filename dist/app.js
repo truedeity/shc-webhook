@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var app = require("./webhook-server");
+var app = require("./WebhookServer");
 var Server = (function () {
     function Server() {
     }

@@ -1,4 +1,4 @@
-import * as app from "./webhook-server" 
+import * as app from "./WebhookServer" 
 
 
 export class Server {
