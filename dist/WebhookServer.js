@@ -70,6 +70,7 @@ var WebhookServer = (function () {
             socket.on("pin", function (message) {
                 var client = new ConnectedClient(message, socket.id, socket);
                 index = WebhookServer.connectedClients.push(client);
+                socket.emit("pin-accepted", socket.id);
             });
             socket.on('disconnect', function () {
                 WebhookServer.connectedClients = WebhookServer.connectedClients.splice(index, 1);
