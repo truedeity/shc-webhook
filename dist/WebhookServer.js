@@ -39,17 +39,29 @@ var WebhookServer = (function () {
     }
     WebhookServer.prototype.startRestService = function () {
         restService.post("/hook", function (req, res) {
+            console.log(req.body);
             if (req.body && req.body.result) {
                 var data = req.body.result;
-                if (data.contexts[0].name == "defaultwelcomeintent-followup") {
-                    var welcomeIntent = new ApiAiWelcomeIntent(data, req.body.sessionId);
-                    WebhookServer.apiAiWelcomeMessages.push(welcomeIntent);
+                if (data.metadata.intentId == "1fb8cef5-5bb0-4501-bf6f-f47f408b5cd8") {
+                    var pinNumber = data.contexts[0].parameters["pin-number"];
+                    if (pinNumber) {
+                        var welcomeIntent = new ApiAiWelcomeIntent(pinNumber, req.body.sessionId);
+                        if (!WebhookServer.apiAiWelcomeMessages.find(function (m) { return m.sessionId == req.body.sessionId; })) {
+                            console.log("adding item");
+                            WebhookServer.apiAiWelcomeMessages.push(welcomeIntent);
+                        }
+                    }
                 }
                 else {
                     var sessionId = req.body.sessionId;
+                    console.log(sessionId);
+                    console.log(typeof (req.body));
                     var welcomeMessage = WebhookServer.apiAiWelcomeMessages.find(function (m) { return m.sessionId == sessionId; });
+                    console.log(welcomeMessage);
                     if (welcomeMessage && welcomeMessage.pinNumber) {
                         var client = WebhookServer.connectedClients.find(function (s) { return s.pinNumber == welcomeMessage.pinNumber; });
+                        console.log(client);
+                        console.log(client.pinNumber);
                         if (client && client.socket && client.socket.connected) {
                             client.socket.emit("api-ai-message", JSON.stringify(req.body));
                         }
@@ -69,6 +81,7 @@ var WebhookServer = (function () {
             var index = -1;
             socket.on("pin", function (message) {
                 console.log("pin");
+                console.log(message);
                 var client = new ConnectedClient(message, socket.id, socket);
                 index = WebhookServer.connectedClients.push(client);
                 socket.emit("pin-accepted", socket.id);

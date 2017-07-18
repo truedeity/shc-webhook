@@ -25,22 +25,22 @@ const io = socketIo(server2);
 
 
 export class ApiAiWelcomeIntent {
-    
+
     constructor(pinNumber: string, sessionId: string) {
-        
+
         this.pinNumber = pinNumber;
         this.sessionId = sessionId;
 
     }
 
     public sessionId: string;
-    public pinNumber: string; 
+    public pinNumber: string;
 
 }
 
 export class ConnectedClient {
     constructor(pinNumber: string, clientId: string, socket: SocketIO.Socket) {
-        
+
         this.clientId = clientId;
         this.pinNumber = pinNumber;
         this.socket = socket;
@@ -63,7 +63,7 @@ export class WebhookServer {
         this.startRestService();
         this.startSocketIO();
 
-        
+
 
     }
 
@@ -71,25 +71,45 @@ export class WebhookServer {
 
         restService.post("/hook", (req, res) => {
 
+            console.log(req.body);
+
             if (req.body && req.body.result) {
 
                 var data = req.body.result;
 
-                if (data.contexts[0].name == "defaultwelcomeintent-followup") {
+                if (data.metadata.intentId == "1fb8cef5-5bb0-4501-bf6f-f47f408b5cd8") {
 
-                    var welcomeIntent = new ApiAiWelcomeIntent(data, req.body.sessionId);
+                    var pinNumber = data.contexts[0].parameters["pin-number"];
 
-                    WebhookServer.apiAiWelcomeMessages.push(welcomeIntent);
+                    if (pinNumber) {
+                        
+                        var welcomeIntent = new ApiAiWelcomeIntent(pinNumber, req.body.sessionId);
+
+                        if (!WebhookServer.apiAiWelcomeMessages.find(m => m.sessionId == req.body.sessionId)) {
+                            console.log("adding item")
+                            WebhookServer.apiAiWelcomeMessages.push(welcomeIntent);
+
+                        }
+
+                    }
 
                 } else {
 
                     var sessionId: string = req.body.sessionId;
 
+                    console.log(sessionId);
+                    console.log(typeof (req.body));
+
                     var welcomeMessage = WebhookServer.apiAiWelcomeMessages.find(m => m.sessionId == sessionId);
+
+                    console.log(welcomeMessage);
 
                     if (welcomeMessage && welcomeMessage.pinNumber) {
 
                         var client = WebhookServer.connectedClients.find(s => s.pinNumber == welcomeMessage.pinNumber);
+
+                        console.log(client);
+                        console.log(client.pinNumber);
 
                         if (client && client.socket && client.socket.connected) {
 
@@ -122,6 +142,7 @@ export class WebhookServer {
             socket.on("pin", (message) => {
 
                 console.log("pin");
+                console.log(message);
 
                 var client = new ConnectedClient(message, socket.id, socket);
                 index = WebhookServer.connectedClients.push(client);
