@@ -52,7 +52,7 @@ var WebhookServer = (function () {
             res.json(util.inspect(WebhookServer.apiAiWelcomeMessages, false));
         });
         app.get("/lastWelcomeIntent", function (req, res) {
-            res.json(WebhookServer.lastHookData);
+            res.json(util.inspect(WebhookServer.lastHookData));
         });
         app.post("/hook", function (req, res) {
             console.log(req.body);

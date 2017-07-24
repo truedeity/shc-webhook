@@ -93,7 +93,7 @@ export class WebhookServer {
         })
 
         app.get("/lastWelcomeIntent", (req, res) => {
-            res.json(WebhookServer.lastHookData);
+            res.json(util.inspect(WebhookServer.lastHookData));
         })
 
 
