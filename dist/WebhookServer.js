@@ -52,10 +52,10 @@ var WebhookServer = (function () {
             res.json(util.inspect(WebhookServer.apiAiWelcomeMessages, false));
         });
         app.get("/lastWelcomeIntent", function (req, res) {
-            res.json(util.inspect(WebhookServer.lastHookData));
+            res.json(util.inspect(WebhookServer.lastHookData, false));
         });
         app.post("/hook", function (req, res) {
-            WebhookServer.lastHookData = req.body;
+            WebhookServer.lastHookData = JSON.stringify(req.body);
             if (req.body && req.body.result) {
                 var data = req.body.result;
                 if (data.metadata.intentId == "1fb8cef5-5bb0-4501-bf6f-f47f408b5cd8") {
@@ -117,6 +117,7 @@ var WebhookServer = (function () {
     //private activeSocket :SocketIO.Socket; 
     WebhookServer.apiAiWelcomeMessages = [];
     WebhookServer.connectedClients = [];
+    WebhookServer.lastHookData = {};
     return WebhookServer;
 }());
 exports.WebhookServer = WebhookServer;

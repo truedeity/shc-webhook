@@ -69,15 +69,13 @@ export class WebhookServer {
     //private activeSocket :SocketIO.Socket; 
     private static apiAiWelcomeMessages: Array<ApiAiWelcomeIntent> = [];
     private static connectedClients: Array<ConnectedClient> = [];
-    private static lastHookData: any;
+    private static lastHookData: any = {};
 
 
     constructor() {
 
         this.startRestService();
         this.startSocketIO();
-
-
 
     }
 
@@ -93,13 +91,13 @@ export class WebhookServer {
         })
 
         app.get("/lastWelcomeIntent", (req, res) => {
-            res.json(util.inspect(WebhookServer.lastHookData));
+            res.json(util.inspect(WebhookServer.lastHookData, false));
         })
 
 
         app.post("/hook", (req, res) => {
 
-            WebhookServer.lastHookData = req.body;
+            WebhookServer.lastHookData = JSON.stringify(req.body);
 
             if (req.body && req.body.result) {
 
