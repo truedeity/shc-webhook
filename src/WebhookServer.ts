@@ -99,12 +99,11 @@ export class WebhookServer {
 
         app.post("/hook", (req, res) => {
 
-            console.log(req.body);
+            WebhookServer.lastHookData = req.body;
 
             if (req.body && req.body.result) {
 
                 var data = req.body.result;
-                WebhookServer.lastHookData = req.body;
 
                 if (data.metadata.intentId == "1fb8cef5-5bb0-4501-bf6f-f47f408b5cd8") {
 
@@ -113,8 +112,6 @@ export class WebhookServer {
                     if (pinNumber) {
 
                         var welcomeIntent = new ApiAiWelcomeIntent(pinNumber, req.body.sessionId);
-
-                        console.log(JSON.stringify(welcomeIntent));
 
                         if (!WebhookServer.apiAiWelcomeMessages.find(m => m.sessionId == req.body.sessionId)) {
                             console.log("adding item")
@@ -125,7 +122,7 @@ export class WebhookServer {
                     }
 
                     return res.json({
-                        speech: "Good day!  Can you tell me some of the patients vitals?  (For example: heart rate)",
+                        speech: "your pin number is  " + pinNumber,
                         displayText: "Good day!  Can you tell me some of the patients vitals?  (For example: heart rate)",
                         source: "shc-webhook"
                     })
