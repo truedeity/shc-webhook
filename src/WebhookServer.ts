@@ -69,6 +69,7 @@ export class WebhookServer {
     //private activeSocket :SocketIO.Socket; 
     private static apiAiWelcomeMessages: Array<ApiAiWelcomeIntent> = [];
     private static connectedClients: Array<ConnectedClient> = [];
+    private static lastHookData: any;
 
 
     constructor() {
@@ -88,7 +89,11 @@ export class WebhookServer {
 
 
         app.get("/welcomeIntents", (req, res) => {
-            res.json(util.inspect(WebhookServer.apiAiWelcomeMessages));
+            res.json(util.inspect(WebhookServer.apiAiWelcomeMessages, false));
+        })
+
+        app.get("/lastWelcomeIntent", (req, res) => {
+            res.json(WebhookServer.lastHookData);
         })
 
 
@@ -99,6 +104,7 @@ export class WebhookServer {
             if (req.body && req.body.result) {
 
                 var data = req.body.result;
+                WebhookServer.lastHookData = req.body;
 
                 if (data.metadata.intentId == "1fb8cef5-5bb0-4501-bf6f-f47f408b5cd8") {
 

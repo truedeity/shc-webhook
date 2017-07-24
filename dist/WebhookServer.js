@@ -49,12 +49,16 @@ var WebhookServer = (function () {
             res.json(util.inspect(WebhookServer.connectedClients, false));
         });
         app.get("/welcomeIntents", function (req, res) {
-            res.json(util.inspect(WebhookServer.apiAiWelcomeMessages));
+            res.json(util.inspect(WebhookServer.apiAiWelcomeMessages, false));
+        });
+        app.get("/lastWelcomeIntent", function (req, res) {
+            res.json(WebhookServer.lastHookData);
         });
         app.post("/hook", function (req, res) {
             console.log(req.body);
             if (req.body && req.body.result) {
                 var data = req.body.result;
+                WebhookServer.lastHookData = req.body;
                 if (data.metadata.intentId == "1fb8cef5-5bb0-4501-bf6f-f47f408b5cd8") {
                     var pinNumber = data.parameters["pin-number"];
                     if (pinNumber) {
