@@ -79,11 +79,13 @@ export class WebhookServer {
 
                 if (data.metadata.intentId == "1fb8cef5-5bb0-4501-bf6f-f47f408b5cd8") {
 
-                    var pinNumber = data.contexts[0].parameters["pin-number"];
+                    var pinNumber = data.parameters["pin-number"];
 
                     if (pinNumber) {
 
                         var welcomeIntent = new ApiAiWelcomeIntent(pinNumber, req.body.sessionId);
+
+                        console.log(JSON.stringify(welcomeIntent));
 
                         if (!WebhookServer.apiAiWelcomeMessages.find(m => m.sessionId == req.body.sessionId)) {
                             console.log("adding item")
@@ -104,7 +106,7 @@ export class WebhookServer {
                     var sessionId: string = req.body.sessionId;
 
                     console.log(sessionId);
-                    console.log(typeof (req.body));
+                    console.log(WebhookServer.apiAiWelcomeMessages.length);
 
                     var welcomeMessage = WebhookServer.apiAiWelcomeMessages.find(m => m.sessionId == sessionId);
 
@@ -112,14 +114,17 @@ export class WebhookServer {
 
                     if (welcomeMessage && welcomeMessage.pinNumber) {
 
-                        var client = WebhookServer.connectedClients.find(s => s.pinNumber == welcomeMessage.pinNumber);
+                        if (WebhookServer.connectedClients.length > 0) {
 
-                        console.log(client);
-                        console.log(client.pinNumber);
+                            var client = WebhookServer.connectedClients.find(s => s.pinNumber == welcomeMessage.pinNumber);
 
-                        if (client && client.socket && client.socket.connected) {
+                            console.log(client);
 
-                            client.socket.emit("api-ai-message", JSON.stringify(req.body));
+                            if (client && client.socket && client.socket.connected) {
+
+                                client.socket.emit("api-ai-message", JSON.stringify(req.body));
+
+                            }
 
                         }
 
