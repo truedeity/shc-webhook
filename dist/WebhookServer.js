@@ -4,16 +4,17 @@ var express = require("express");
 var http = require("http");
 var socketIo = require("socket.io");
 var bodyParser = require("body-parser");
+var util = require("util");
 //import { ApiAiWelcomeIntent } from "./Models/ApiAiWelcomeIntent"
 //import { ConnectedClient } from "./Models/ConnectedClient"
-var restService = express();
-restService.use(bodyParser.json());
+var app = express();
+app.use(bodyParser.json());
 // var options = {
 //   key: fs.readFileSync('key.pem'),
 //   cert: fs.readFileSync('cert.cert')
 // };
-var server = http.createServer(restService).listen(5000);
-var server2 = http.createServer(restService).listen(process.env.PORT || 1337);
+var server = http.createServer(app).listen(5000);
+var server2 = http.createServer(app).listen(process.env.PORT || 1337);
 var io = socketIo(server2);
 var ApiAiWelcomeIntent = (function () {
     function ApiAiWelcomeIntent(pinNumber, sessionId) {
@@ -29,6 +30,12 @@ var ConnectedClient = (function () {
         this.pinNumber = pinNumber;
         this.socket = socket;
     }
+    ConnectedClient.prototype.sendMessage = function (event, message) {
+        if (this.socket && this.socket.connected) {
+            console.log("sending message to client" + this.socket.id);
+            this.socket.emit(event, message);
+        }
+    };
     return ConnectedClient;
 }());
 exports.ConnectedClient = ConnectedClient;
@@ -38,7 +45,13 @@ var WebhookServer = (function () {
         this.startSocketIO();
     }
     WebhookServer.prototype.startRestService = function () {
-        restService.post("/hook", function (req, res) {
+        app.get("/clients", function (req, res) {
+            res.json(util.inspect(WebhookServer.connectedClients, false));
+        });
+        app.get("/welcomeIntents", function (req, res) {
+            res.json(util.inspect(WebhookServer.apiAiWelcomeMessages));
+        });
+        app.post("/hook", function (req, res) {
             console.log(req.body);
             if (req.body && req.body.result) {
                 var data = req.body.result;
@@ -68,8 +81,8 @@ var WebhookServer = (function () {
                         if (WebhookServer.connectedClients.length > 0) {
                             var client = WebhookServer.connectedClients.find(function (s) { return s.pinNumber == welcomeMessage.pinNumber; });
                             console.log(client);
-                            if (client && client.socket && client.socket.connected) {
-                                client.socket.emit("api-ai-message", JSON.stringify(req.body));
+                            if (client) {
+                                client.sendMessage("api-ai-message", JSON.stringify(req.body));
                             }
                         }
                     }
@@ -94,7 +107,8 @@ var WebhookServer = (function () {
                 socket.emit("pin-accepted", socket.id);
             });
             socket.on('disconnect', function () {
-                WebhookServer.connectedClients = WebhookServer.connectedClients.splice(index, 1);
+                console.log("dosconnecting... index: " + index);
+                WebhookServer.connectedClients.splice(index - 1, 1);
             });
         });
     };

@@ -5,12 +5,15 @@ import * as socketIo from "socket.io";
 import * as bodyParser from "body-parser";
 import * as crypto from "crypto";
 import * as fs from "fs";
+
+import * as util from "util";
+
 //import { ApiAiWelcomeIntent } from "./Models/ApiAiWelcomeIntent"
 //import { ConnectedClient } from "./Models/ConnectedClient"
 
 
-const restService = express();
-restService.use(bodyParser.json())
+const app = express();
+app.use(bodyParser.json())
 
 // var options = {
 //   key: fs.readFileSync('key.pem'),
@@ -18,8 +21,8 @@ restService.use(bodyParser.json())
 // };
 
 
-const server = http.createServer(restService).listen(5000);
-const server2 = http.createServer(restService).listen(process.env.PORT || 1337);
+const server = http.createServer(app).listen(5000);
+const server2 = http.createServer(app).listen(process.env.PORT || 1337);
 
 const io = socketIo(server2);
 
@@ -39,15 +42,25 @@ export class ApiAiWelcomeIntent {
 }
 
 export class ConnectedClient {
+
+    private socket: SocketIO.Socket;
+
     constructor(pinNumber: string, clientId: string, socket: SocketIO.Socket) {
 
         this.clientId = clientId;
         this.pinNumber = pinNumber;
         this.socket = socket;
     }
+
     public clientId: string;
     public pinNumber: string;
-    public socket: SocketIO.Socket;
+
+    sendMessage(event: string, message: string) {
+        if (this.socket && this.socket.connected) {
+            console.log("sending message to client" + this.socket.id);
+            this.socket.emit(event, message);
+        }
+    }
 }
 
 
@@ -69,7 +82,17 @@ export class WebhookServer {
 
     startRestService() {
 
-        restService.post("/hook", (req, res) => {
+        app.get("/clients", (req, res) => {
+            res.json(util.inspect(WebhookServer.connectedClients, false));
+        })
+
+
+        app.get("/welcomeIntents", (req, res) => {
+            res.json(util.inspect(WebhookServer.apiAiWelcomeMessages));
+        })
+
+
+        app.post("/hook", (req, res) => {
 
             console.log(req.body);
 
@@ -120,9 +143,9 @@ export class WebhookServer {
 
                             console.log(client);
 
-                            if (client && client.socket && client.socket.connected) {
+                            if (client) {
 
-                                client.socket.emit("api-ai-message", JSON.stringify(req.body));
+                                client.sendMessage("api-ai-message", JSON.stringify(req.body));
 
                             }
 
@@ -163,7 +186,8 @@ export class WebhookServer {
             })
 
             socket.on('disconnect', () => {
-                WebhookServer.connectedClients = WebhookServer.connectedClients.splice(index, 1);
+                console.log("dosconnecting... index: " + index)
+                WebhookServer.connectedClients.splice(index -1, 1);
             });
 
         })
