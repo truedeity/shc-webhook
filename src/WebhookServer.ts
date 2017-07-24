@@ -82,7 +82,7 @@ export class WebhookServer {
                     var pinNumber = data.contexts[0].parameters["pin-number"];
 
                     if (pinNumber) {
-                        
+
                         var welcomeIntent = new ApiAiWelcomeIntent(pinNumber, req.body.sessionId);
 
                         if (!WebhookServer.apiAiWelcomeMessages.find(m => m.sessionId == req.body.sessionId)) {
@@ -92,6 +92,12 @@ export class WebhookServer {
                         }
 
                     }
+
+                    return res.json({
+                        speech: "Good day!  Can you tell me some of the patients vitals?  (For example: heart rate)",
+                        displayText: "Good day!  Can you tell me some of the patients vitals?  (For example: heart rate)",
+                        source: "shc-webhook"
+                    })
 
                 } else {
 

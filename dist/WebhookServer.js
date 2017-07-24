@@ -51,6 +51,11 @@ var WebhookServer = (function () {
                             WebhookServer.apiAiWelcomeMessages.push(welcomeIntent);
                         }
                     }
+                    return res.json({
+                        speech: "Good day!  Can you tell me some of the patients vitals?  (For example: heart rate)",
+                        displayText: "Good day!  Can you tell me some of the patients vitals?  (For example: heart rate)",
+                        source: "shc-webhook"
+                    });
                 }
                 else {
                     var sessionId = req.body.sessionId;
