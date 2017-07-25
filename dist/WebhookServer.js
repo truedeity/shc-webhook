@@ -87,8 +87,8 @@ var WebhookServer = (function () {
                 }
             }
             return res.json({
-                speech: speechMessage,
-                displayText: speechMessage,
+                //speech: speechMessage,
+                //displayText: speechMessage,
                 source: "shc-webhook"
             });
         });
