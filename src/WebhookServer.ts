@@ -99,6 +99,8 @@ export class WebhookServer {
 
             WebhookServer.lastHookData = JSON.stringify(req.body);
 
+            var speechMessage: string = "got it";
+
             if (req.body && req.body.result) {
 
                 var data = req.body.result;
@@ -112,18 +114,13 @@ export class WebhookServer {
                         var welcomeIntent = new ApiAiWelcomeIntent(pinNumber, req.body.sessionId);
 
                         if (!WebhookServer.apiAiWelcomeMessages.find(m => m.sessionId == req.body.sessionId)) {
-                            console.log("adding item")
-                            WebhookServer.apiAiWelcomeMessages.push(welcomeIntent);
 
+                            WebhookServer.apiAiWelcomeMessages.push(welcomeIntent);
+                            
+                            speechMessage = "added welcome intent";
                         }
 
                     }
-
-                    return res.json({
-                        speech: "your pin number is  " + pinNumber,
-                        displayText: "Good day!  Can you tell me some of the patients vitals?  (For example: heart rate)",
-                        source: "shc-webhook"
-                    })
 
                 } else {
 
@@ -157,8 +154,8 @@ export class WebhookServer {
             }
 
             return res.json({
-                speech: "got it",
-                displayText: "got it",
+                speech: speechMessage,
+                displayText: speechMessage,
                 source: "shc-webhook"
             })
         })
@@ -188,7 +185,7 @@ export class WebhookServer {
 
             socket.on('disconnect', () => {
                 console.log("dosconnecting... index: " + index)
-                WebhookServer.connectedClients.splice(index -1, 1);
+                WebhookServer.connectedClients.splice(index - 1, 1);
             });
 
         })

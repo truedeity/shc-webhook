@@ -56,6 +56,7 @@ var WebhookServer = (function () {
         });
         app.post("/hook", function (req, res) {
             WebhookServer.lastHookData = JSON.stringify(req.body);
+            var speechMessage = "got it";
             if (req.body && req.body.result) {
                 var data = req.body.result;
                 if (data.metadata.intentId == "1fb8cef5-5bb0-4501-bf6f-f47f408b5cd8") {
@@ -63,15 +64,10 @@ var WebhookServer = (function () {
                     if (pinNumber) {
                         var welcomeIntent = new ApiAiWelcomeIntent(pinNumber, req.body.sessionId);
                         if (!WebhookServer.apiAiWelcomeMessages.find(function (m) { return m.sessionId == req.body.sessionId; })) {
-                            console.log("adding item");
                             WebhookServer.apiAiWelcomeMessages.push(welcomeIntent);
+                            speechMessage = "added welcome intent";
                         }
                     }
-                    return res.json({
-                        speech: "your pin number is  " + pinNumber,
-                        displayText: "Good day!  Can you tell me some of the patients vitals?  (For example: heart rate)",
-                        source: "shc-webhook"
-                    });
                 }
                 else {
                     var sessionId = req.body.sessionId;
@@ -91,8 +87,8 @@ var WebhookServer = (function () {
                 }
             }
             return res.json({
-                speech: "got it",
-                displayText: "got it",
+                speech: speechMessage,
+                displayText: speechMessage,
                 source: "shc-webhook"
             });
         });
