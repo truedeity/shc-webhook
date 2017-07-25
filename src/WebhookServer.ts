@@ -83,21 +83,21 @@ export class WebhookServer {
 
         app.get("/clients", (req, res) => {
             res.json(util.inspect(WebhookServer.connectedClients, false));
-        })
+        });
 
 
         app.get("/welcomeIntents", (req, res) => {
             res.json(util.inspect(WebhookServer.apiAiWelcomeMessages, false));
-        })
+        });
 
         app.get("/lastWelcomeIntent", (req, res) => {
             res.json(util.inspect(WebhookServer.lastHookData, false));
-        })
+        });
 
 
         app.post("/hook", (req, res) => {
 
-            WebhookServer.lastHookData = JSON.stringify(req.body);
+            WebhookServer.lastHookData = req.body.sessionId;
 
             var speechMessage: string = "got it";
 
@@ -157,7 +157,7 @@ export class WebhookServer {
                 //speech: speechMessage,
                 //displayText: speechMessage,
                 source: "shc-webhook"
-            })
+            });
         })
 
 

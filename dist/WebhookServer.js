@@ -55,7 +55,7 @@ var WebhookServer = (function () {
             res.json(util.inspect(WebhookServer.lastHookData, false));
         });
         app.post("/hook", function (req, res) {
-            WebhookServer.lastHookData = JSON.stringify(req.body);
+            WebhookServer.lastHookData = req.body.sessionId;
             var speechMessage = "got it";
             if (req.body && req.body.result) {
                 var data = req.body.result;
