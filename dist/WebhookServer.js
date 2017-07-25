@@ -65,7 +65,7 @@ var WebhookServer = (function () {
                         var welcomeIntent = new ApiAiWelcomeIntent(pinNumber, req.body.sessionId);
                         if (!WebhookServer.apiAiWelcomeMessages.find(function (m) { return m.sessionId == req.body.sessionId; })) {
                             WebhookServer.apiAiWelcomeMessages.push(welcomeIntent);
-                            speechMessage = "added welcome intent";
+                            speechMessage = "added welcome intent " + WebhookServer.apiAiWelcomeMessages.length;
                         }
                     }
                 }

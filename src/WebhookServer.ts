@@ -117,7 +117,7 @@ export class WebhookServer {
 
                             WebhookServer.apiAiWelcomeMessages.push(welcomeIntent);
                             
-                            speechMessage = "added welcome intent";
+                            speechMessage = "added welcome intent " + WebhookServer.apiAiWelcomeMessages.length;
                         }
 
                     }
