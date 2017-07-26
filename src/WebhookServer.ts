@@ -100,7 +100,7 @@ export class WebhookServer {
 
 
         app.get("/welcomeIntents", (req, res) => {
-            res.json(util.inspect(WebhookServer.apiAiWelcomeMessages, false));
+            res.json(WebhookServer.apiAiWelcomeMessages.length);
         });
 
         app.get("/lastWelcomeIntent", (req, res) => {

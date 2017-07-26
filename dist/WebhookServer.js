@@ -58,7 +58,7 @@ var WebhookServer = (function () {
             res.json(util.inspect(WebhookServer.connectedClients, false));
         });
         app.get("/welcomeIntents", function (req, res) {
-            res.json(util.inspect(WebhookServer.apiAiWelcomeMessages, false));
+            res.json(WebhookServer.apiAiWelcomeMessages.length);
         });
         app.get("/lastWelcomeIntent", function (req, res) {
             res.json(util.inspect(WebhookServer.lastHookData, false));
