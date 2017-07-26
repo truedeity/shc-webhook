@@ -43,6 +43,15 @@ var WebhookServer = (function () {
     function WebhookServer() {
         this.startRestService();
         this.startSocketIO();
+        if (!WebhookServer.apiAiWelcomeMessages) {
+            WebhookServer.apiAiWelcomeMessages = [];
+        }
+        if (!WebhookServer.connectedClients) {
+            WebhookServer.connectedClients = [];
+        }
+        if (!WebhookServer.lastHookData) {
+            WebhookServer.lastHookData = {};
+        }
     }
     WebhookServer.prototype.startRestService = function () {
         app.get("/clients", function (req, res) {
@@ -87,8 +96,8 @@ var WebhookServer = (function () {
                 }
             }
             return res.json({
-                //speech: speechMessage,
-                //displayText: speechMessage,
+                speech: speechMessage,
+                displayText: speechMessage,
                 source: "shc-webhook"
             });
         });
@@ -110,10 +119,6 @@ var WebhookServer = (function () {
             });
         });
     };
-    //private activeSocket :SocketIO.Socket; 
-    WebhookServer.apiAiWelcomeMessages = [];
-    WebhookServer.connectedClients = [];
-    WebhookServer.lastHookData = {};
     return WebhookServer;
 }());
 exports.WebhookServer = WebhookServer;

@@ -67,15 +67,28 @@ export class ConnectedClient {
 export class WebhookServer {
 
     //private activeSocket :SocketIO.Socket; 
-    private static apiAiWelcomeMessages: Array<ApiAiWelcomeIntent> = [];
-    private static connectedClients: Array<ConnectedClient> = [];
-    private static lastHookData: any = {};
+    private static apiAiWelcomeMessages: Array<ApiAiWelcomeIntent>;
+    private static connectedClients: Array<ConnectedClient>;
+    private static lastHookData: any;
 
 
     constructor() {
 
         this.startRestService();
         this.startSocketIO();
+
+
+        if(!WebhookServer.apiAiWelcomeMessages) {
+            WebhookServer.apiAiWelcomeMessages = [];
+        }
+
+        if(!WebhookServer.connectedClients) {
+            WebhookServer.connectedClients = [];
+        }   
+
+         if(!WebhookServer.lastHookData) {
+            WebhookServer.lastHookData = {};
+        }   
 
     }
 
@@ -154,8 +167,8 @@ export class WebhookServer {
             }
 
             return res.json({
-                //speech: speechMessage,
-                //displayText: speechMessage,
+                speech: speechMessage,
+                displayText: speechMessage,
                 source: "shc-webhook"
             });
         })
