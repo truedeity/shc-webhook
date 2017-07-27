@@ -90,6 +90,12 @@ export class WebhookServer {
             res.json(util.inspect(WebhookServer.connectedClients, false));
         });
 
+        app.get("reset", (req, res) => {
+            WebhookServer.connectedClients = [];
+            WebhookServer.apiAiWelcomeMessages = [];
+            res.json("done.");
+        })
+
 
         app.get("/welcomeIntents", (req, res) => {
             res.json(WebhookServer.apiAiWelcomeMessages.length);

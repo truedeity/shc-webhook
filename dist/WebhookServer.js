@@ -53,6 +53,11 @@ var WebhookServer = (function () {
         app.get("/clients", function (req, res) {
             res.json(util.inspect(WebhookServer.connectedClients, false));
         });
+        app.get("reset", function (req, res) {
+            WebhookServer.connectedClients = [];
+            WebhookServer.apiAiWelcomeMessages = [];
+            res.json("done.");
+        });
         app.get("/welcomeIntents", function (req, res) {
             res.json(WebhookServer.apiAiWelcomeMessages.length);
         });
