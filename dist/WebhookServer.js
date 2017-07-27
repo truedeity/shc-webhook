@@ -81,14 +81,22 @@ var WebhookServer = (function () {
                             var client = WebhookServer.connectedClients.find(function (s) { return s.pinNumber == welcomeMessage.pinNumber && s.isConnected(); });
                             if (client) {
                                 client.sendMessage("api-ai-message", JSON.stringify(req.body));
+                                if (req.body.result.action == "DefaultWelcomeIntent.NewVisit") {
+                                    return res.json({
+                                        speech: "what is his heart rate?",
+                                        displayText: "what is his heart rate?",
+                                        source: "shc-webhook"
+                                    });
+                                }
+                                if (req.body.result.action == "DefaultWelcomeIntent.NewVisit.Vitals") {
+                                    //todo
+                                }
                             }
                         }
                     }
                 }
             }
             return res.json({
-                //speech: speechMessage,
-                //displayText: speechMessage,
                 source: "shc-webhook"
             });
         });
