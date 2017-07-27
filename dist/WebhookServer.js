@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 //   key: fs.readFileSync('key.pem'),
 //   cert: fs.readFileSync('cert.cert')
 // };
-var server = http.createServer(app).listen(5000);
+//const server = http.createServer(app).listen(5000);
 var server2 = http.createServer(app).listen(process.env.PORT || 1337);
 var io = socketIo(server2);
 var ApiAiWelcomeIntent = (function () {
@@ -34,10 +34,12 @@ var ConnectedClient = (function () {
         if (this.socket && this.socket.connected) {
             console.log("sending message to client" + this.socket.id);
             this.socket.emit(event, message);
+            return true;
         }
+        return false;
     };
     ConnectedClient.prototype.isConnected = function () {
-        return this.socket.connected;
+        return this.socket && this.socket.connected;
     };
     return ConnectedClient;
 }());
@@ -77,7 +79,7 @@ var WebhookServer = (function () {
                     var welcomeMessage = WebhookServer.apiAiWelcomeMessages.find(function (m) { return m.sessionId == sessionId; });
                     if (welcomeMessage && welcomeMessage.pinNumber) {
                         if (WebhookServer.connectedClients.length > 0) {
-                            var client = WebhookServer.connectedClients.find(function (s) { return s.pinNumber == welcomeMessage.pinNumber; });
+                            var client = WebhookServer.connectedClients.find(function (s) { return s.pinNumber == welcomeMessage.pinNumber && s.isConnected(); });
                             if (client) {
                                 client.sendMessage("api-ai-message", JSON.stringify(req.body));
                             }
@@ -86,8 +88,8 @@ var WebhookServer = (function () {
                 }
             }
             return res.json({
-                //speech: speechMessage,
-                //displayText: speechMessage,
+                speech: speechMessage,
+                displayText: speechMessage,
                 source: "shc-webhook"
             });
         });
@@ -107,15 +109,7 @@ var WebhookServer = (function () {
                 WebhookServer.connectedClients.splice(index - 1, 1);
             });
         });
-        // setInterval(function () {
-        //     var index = -2;
-        //     while(index != -1) {
-        //         index = WebhookServer.connectedClients.findIndex(ele => !ele.isConnected());
-        //         WebhookServer.connectedClients.splice(index, 1);
-        //     }
-        // }, 10000)
     };
-    //private activeSocket :SocketIO.Socket; 
     WebhookServer.apiAiWelcomeMessages = [];
     WebhookServer.connectedClients = [];
     WebhookServer.lastHookData = {};

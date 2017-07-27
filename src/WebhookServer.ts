@@ -21,7 +21,7 @@ app.use(bodyParser.json())
 // };
 
 
-const server = http.createServer(app).listen(5000);
+//const server = http.createServer(app).listen(5000);
 const server2 = http.createServer(app).listen(process.env.PORT || 1337);
 
 const io = socketIo(server2);
@@ -59,18 +59,19 @@ export class ConnectedClient {
         if (this.socket && this.socket.connected) {
             console.log("sending message to client" + this.socket.id);
             this.socket.emit(event, message);
-        }
+            return true;
+        } 
+        return false;
     }
 
     isConnected() {
-        return this.socket.connected;
+        return this.socket && this.socket.connected;
     }
 }
 
 
 export class WebhookServer {
 
-    //private activeSocket :SocketIO.Socket; 
     private static apiAiWelcomeMessages: Array<ApiAiWelcomeIntent> = [];
     private static connectedClients: Array<ConnectedClient> = [];
     private static lastHookData: any = {};
@@ -136,11 +137,11 @@ export class WebhookServer {
 
                         if (WebhookServer.connectedClients.length > 0) {
 
-                            var client = WebhookServer.connectedClients.find(s => s.pinNumber == welcomeMessage.pinNumber);
-
+                            var client = WebhookServer.connectedClients.find(s => s.pinNumber == welcomeMessage.pinNumber && s.isConnected());
+                            
                             if (client) {
 
-                                client.sendMessage("api-ai-message", JSON.stringify(req.body));
+                                client.sendMessage("api-ai-message", JSON.stringify(req.body))
 
                             }
 
@@ -151,8 +152,8 @@ export class WebhookServer {
             }
 
             return res.json({
-                //speech: speechMessage,
-                //displayText: speechMessage,
+                speech: speechMessage,
+                displayText: speechMessage,
                 source: "shc-webhook"
             });
         })
@@ -184,16 +185,6 @@ export class WebhookServer {
             });
 
         })
-
-        // setInterval(function () {
-        //     var index = -2;
-
-        //     while(index != -1) {
-        //         index = WebhookServer.connectedClients.findIndex(ele => !ele.isConnected());
-        //         WebhookServer.connectedClients.splice(index, 1);
-        //     }
-
-        // }, 10000)
 
     }
 
