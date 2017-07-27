@@ -185,15 +185,15 @@ export class WebhookServer {
 
         })
 
-        setInterval(function () {
-            var index = -2;
+        // setInterval(function () {
+        //     var index = -2;
 
-            while(index != -1) {
-                index = WebhookServer.connectedClients.findIndex(ele => !ele.isConnected());
-                WebhookServer.connectedClients.splice(index, 1);
-            }
+        //     while(index != -1) {
+        //         index = WebhookServer.connectedClients.findIndex(ele => !ele.isConnected());
+        //         WebhookServer.connectedClients.splice(index, 1);
+        //     }
 
-        }, 10000)
+        // }, 10000)
 
     }
 

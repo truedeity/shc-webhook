@@ -107,13 +107,13 @@ var WebhookServer = (function () {
                 WebhookServer.connectedClients.splice(index - 1, 1);
             });
         });
-        setInterval(function () {
-            var index = -2;
-            while (index != -1) {
-                index = WebhookServer.connectedClients.findIndex(function (ele) { return !ele.isConnected(); });
-                WebhookServer.connectedClients.splice(index, 1);
-            }
-        }, 10000);
+        // setInterval(function () {
+        //     var index = -2;
+        //     while(index != -1) {
+        //         index = WebhookServer.connectedClients.findIndex(ele => !ele.isConnected());
+        //         WebhookServer.connectedClients.splice(index, 1);
+        //     }
+        // }, 10000)
     };
     //private activeSocket :SocketIO.Socket; 
     WebhookServer.apiAiWelcomeMessages = [];
