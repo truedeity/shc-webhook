@@ -111,7 +111,7 @@ var WebhookServer = (function () {
             var index = -2;
             while (index != -1) {
                 index = WebhookServer.connectedClients.findIndex(function (ele) { return !ele.isConnected(); });
-                WebhookServer.connectedClients.splice(index - 1, 1);
+                WebhookServer.connectedClients.splice(index, 1);
             }
         }, 10000);
     };

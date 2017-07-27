@@ -190,7 +190,7 @@ export class WebhookServer {
 
             while(index != -1) {
                 index = WebhookServer.connectedClients.findIndex(ele => !ele.isConnected());
-                WebhookServer.connectedClients.splice(index - 1, 1);
+                WebhookServer.connectedClients.splice(index, 1);
             }
 
         }, 10000)
