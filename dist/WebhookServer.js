@@ -5,15 +5,8 @@ var http = require("http");
 var socketIo = require("socket.io");
 var bodyParser = require("body-parser");
 var util = require("util");
-//import { ApiAiWelcomeIntent } from "./Models/ApiAiWelcomeIntent"
-//import { ConnectedClient } from "./Models/ConnectedClient" ...
 var app = express();
 app.use(bodyParser.json());
-// var options = {
-//   key: fs.readFileSync('key.pem'),
-//   cert: fs.readFileSync('cert.cert')
-// };
-//const server = http.createServer(app).listen(5000);
 var server2 = http.createServer(app).listen(process.env.PORT || 1337);
 var io = socketIo(server2);
 var ApiAiWelcomeIntent = (function () {
@@ -50,13 +43,14 @@ var WebhookServer = (function () {
         this.startSocketIO();
     }
     WebhookServer.prototype.startRestService = function () {
+        var _this = this;
         app.get("/clients", function (req, res) {
             res.json(util.inspect(WebhookServer.connectedClients, false));
         });
         app.get("reset", function (req, res) {
             WebhookServer.connectedClients = [];
             WebhookServer.apiAiWelcomeMessages = [];
-            res.json("done.");
+            res.json(util.inspect(_this));
         });
         app.get("/welcomeIntents", function (req, res) {
             res.json(WebhookServer.apiAiWelcomeMessages.length);
@@ -101,17 +95,16 @@ var WebhookServer = (function () {
     };
     WebhookServer.prototype.startSocketIO = function () {
         io.on("connect", function (socket) {
-            var index = -1;
             socket.on("pin", function (message) {
-                console.log("pin");
-                console.log(message);
                 var client = new ConnectedClient(message, socket.id, socket);
-                index = WebhookServer.connectedClients.push(client);
+                WebhookServer.connectedClients.push(client);
                 socket.emit("pin-accepted", socket.id);
             });
             socket.on('disconnect', function () {
-                console.log("dosconnecting... index: " + index);
-                WebhookServer.connectedClients.splice(index - 1, 1);
+                var index = WebhookServer.connectedClients.findIndex(function (s) { return s.clientId == socket.id; });
+                if (index != -1) {
+                    WebhookServer.connectedClients.splice(index, 1);
+                }
             });
         });
     };

@@ -5,27 +5,14 @@ import * as socketIo from "socket.io";
 import * as bodyParser from "body-parser";
 import * as crypto from "crypto";
 import * as fs from "fs";
-
 import * as util from "util";
-
-//import { ApiAiWelcomeIntent } from "./Models/ApiAiWelcomeIntent"
-//import { ConnectedClient } from "./Models/ConnectedClient" ...
 
 
 const app = express();
 app.use(bodyParser.json())
 
-// var options = {
-//   key: fs.readFileSync('key.pem'),
-//   cert: fs.readFileSync('cert.cert')
-// };
-
-
-//const server = http.createServer(app).listen(5000);
 const server2 = http.createServer(app).listen(process.env.PORT || 1337);
-
 const io = socketIo(server2);
-
 
 export class ApiAiWelcomeIntent {
 
@@ -93,7 +80,7 @@ export class WebhookServer {
         app.get("reset", (req, res) => {
             WebhookServer.connectedClients = [];
             WebhookServer.apiAiWelcomeMessages = [];
-            res.json("done.");
+            res.json(util.inspect(this));
         })
 
 
@@ -171,23 +158,21 @@ export class WebhookServer {
 
         io.on("connect", socket => {
 
-            var index: number = -1;
-
             socket.on("pin", (message) => {
 
-                console.log("pin");
-                console.log(message);
-
                 var client = new ConnectedClient(message, socket.id, socket);
-                index = WebhookServer.connectedClients.push(client);
 
+                WebhookServer.connectedClients.push(client);
+                
                 socket.emit("pin-accepted", socket.id);
 
             })
 
             socket.on('disconnect', () => {
-                console.log("dosconnecting... index: " + index)
-                WebhookServer.connectedClients.splice(index - 1, 1);
+                var index = WebhookServer.connectedClients.findIndex(s => s.clientId == socket.id);
+                if(index != -1) {
+                    WebhookServer.connectedClients.splice(index, 1);
+                }
             });
 
         })
