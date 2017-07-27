@@ -36,6 +36,9 @@ var ConnectedClient = (function () {
             this.socket.emit(event, message);
         }
     };
+    ConnectedClient.prototype.isConnected = function () {
+        return this.socket.connected;
+    };
     return ConnectedClient;
 }());
 exports.ConnectedClient = ConnectedClient;
@@ -43,15 +46,6 @@ var WebhookServer = (function () {
     function WebhookServer() {
         this.startRestService();
         this.startSocketIO();
-        if (!WebhookServer.apiAiWelcomeMessages) {
-            WebhookServer.apiAiWelcomeMessages = [];
-        }
-        if (!WebhookServer.connectedClients) {
-            WebhookServer.connectedClients = [];
-        }
-        if (!WebhookServer.lastHookData) {
-            WebhookServer.lastHookData = {};
-        }
     }
     WebhookServer.prototype.startRestService = function () {
         app.get("/clients", function (req, res) {
@@ -80,14 +74,10 @@ var WebhookServer = (function () {
                 }
                 else {
                     var sessionId = req.body.sessionId;
-                    console.log(sessionId);
-                    console.log(WebhookServer.apiAiWelcomeMessages.length);
                     var welcomeMessage = WebhookServer.apiAiWelcomeMessages.find(function (m) { return m.sessionId == sessionId; });
-                    console.log(welcomeMessage);
                     if (welcomeMessage && welcomeMessage.pinNumber) {
                         if (WebhookServer.connectedClients.length > 0) {
                             var client = WebhookServer.connectedClients.find(function (s) { return s.pinNumber == welcomeMessage.pinNumber; });
-                            console.log(client);
                             if (client) {
                                 client.sendMessage("api-ai-message", JSON.stringify(req.body));
                             }
@@ -96,15 +86,14 @@ var WebhookServer = (function () {
                 }
             }
             return res.json({
-                speech: speechMessage,
-                displayText: speechMessage,
+                //speech: speechMessage,
+                //displayText: speechMessage,
                 source: "shc-webhook"
             });
         });
     };
     WebhookServer.prototype.startSocketIO = function () {
         io.on("connect", function (socket) {
-            //this.activeSocket = socket;
             var index = -1;
             socket.on("pin", function (message) {
                 console.log("pin");
@@ -118,7 +107,18 @@ var WebhookServer = (function () {
                 WebhookServer.connectedClients.splice(index - 1, 1);
             });
         });
+        setInterval(function () {
+            var index = -2;
+            while (index != -1) {
+                index = WebhookServer.connectedClients.findIndex(function (ele) { return !ele.isConnected(); });
+                WebhookServer.connectedClients.splice(index - 1, 1);
+            }
+        }, 10000);
     };
+    //private activeSocket :SocketIO.Socket; 
+    WebhookServer.apiAiWelcomeMessages = [];
+    WebhookServer.connectedClients = [];
+    WebhookServer.lastHookData = {};
     return WebhookServer;
 }());
 exports.WebhookServer = WebhookServer;

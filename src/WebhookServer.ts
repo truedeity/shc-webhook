@@ -61,34 +61,25 @@ export class ConnectedClient {
             this.socket.emit(event, message);
         }
     }
+
+    isConnected() {
+        return this.socket.connected;
+    }
 }
 
 
 export class WebhookServer {
 
     //private activeSocket :SocketIO.Socket; 
-    private static apiAiWelcomeMessages: Array<ApiAiWelcomeIntent>;
-    private static connectedClients: Array<ConnectedClient>;
-    private static lastHookData: any;
+    private static apiAiWelcomeMessages: Array<ApiAiWelcomeIntent> = [];
+    private static connectedClients: Array<ConnectedClient> = [];
+    private static lastHookData: any = {};
 
 
     constructor() {
 
         this.startRestService();
         this.startSocketIO();
-
-
-        if(!WebhookServer.apiAiWelcomeMessages) {
-            WebhookServer.apiAiWelcomeMessages = [];
-        }
-
-        if(!WebhookServer.connectedClients) {
-            WebhookServer.connectedClients = [];
-        }   
-
-         if(!WebhookServer.lastHookData) {
-            WebhookServer.lastHookData = {};
-        }   
 
     }
 
@@ -129,7 +120,7 @@ export class WebhookServer {
                         if (!WebhookServer.apiAiWelcomeMessages.find(m => m.sessionId == req.body.sessionId)) {
 
                             WebhookServer.apiAiWelcomeMessages.push(welcomeIntent);
-                            
+
                             speechMessage = "added welcome intent " + WebhookServer.apiAiWelcomeMessages.length;
                         }
 
@@ -139,20 +130,13 @@ export class WebhookServer {
 
                     var sessionId: string = req.body.sessionId;
 
-                    console.log(sessionId);
-                    console.log(WebhookServer.apiAiWelcomeMessages.length);
-
                     var welcomeMessage = WebhookServer.apiAiWelcomeMessages.find(m => m.sessionId == sessionId);
-
-                    console.log(welcomeMessage);
 
                     if (welcomeMessage && welcomeMessage.pinNumber) {
 
                         if (WebhookServer.connectedClients.length > 0) {
 
                             var client = WebhookServer.connectedClients.find(s => s.pinNumber == welcomeMessage.pinNumber);
-
-                            console.log(client);
 
                             if (client) {
 
@@ -167,8 +151,8 @@ export class WebhookServer {
             }
 
             return res.json({
-                speech: speechMessage,
-                displayText: speechMessage,
+                //speech: speechMessage,
+                //displayText: speechMessage,
                 source: "shc-webhook"
             });
         })
@@ -176,11 +160,9 @@ export class WebhookServer {
 
     }
 
-
     startSocketIO() {
 
         io.on("connect", socket => {
-            //this.activeSocket = socket;
 
             var index: number = -1;
 
@@ -202,6 +184,16 @@ export class WebhookServer {
             });
 
         })
+
+        setInterval(function () {
+            var index = -2;
+
+            while(index != -1) {
+                index = WebhookServer.connectedClients.findIndex(ele => !ele.isConnected());
+                WebhookServer.connectedClients.splice(index - 1, 1);
+            }
+
+        }, 10000)
 
     }
 
