@@ -152,8 +152,8 @@ export class WebhookServer {
             }
 
             return res.json({
-                speech: speechMessage,
-                displayText: speechMessage,
+                //speech: speechMessage,
+                //displayText: speechMessage,
                 source: "shc-webhook"
             });
         })
