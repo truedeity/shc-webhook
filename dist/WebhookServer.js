@@ -96,9 +96,16 @@ var WebhookServer = (function () {
     WebhookServer.prototype.startSocketIO = function () {
         io.on("connect", function (socket) {
             socket.on("pin", function (message) {
-                var client = new ConnectedClient(message, socket.id, socket);
-                WebhookServer.connectedClients.push(client);
-                socket.emit("pin-accepted", socket.id);
+                var index = WebhookServer.connectedClients.findIndex(function (s) { return s.clientId == socket.id; });
+                if (index == -1) {
+                    var client = new ConnectedClient(message, socket.id, socket);
+                    WebhookServer.connectedClients.push(client);
+                    socket.emit("pin-accepted", socket.id);
+                }
+                else {
+                    var client = new ConnectedClient(message, socket.id, socket);
+                    WebhookServer.connectedClients[index] = client;
+                }
             });
             socket.on('disconnect', function () {
                 var index = WebhookServer.connectedClients.findIndex(function (s) { return s.clientId == socket.id; });

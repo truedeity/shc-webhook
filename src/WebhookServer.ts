@@ -47,7 +47,7 @@ export class ConnectedClient {
             console.log("sending message to client" + this.socket.id);
             this.socket.emit(event, message);
             return true;
-        } 
+        }
         return false;
     }
 
@@ -131,7 +131,7 @@ export class WebhookServer {
                         if (WebhookServer.connectedClients.length > 0) {
 
                             var client = WebhookServer.connectedClients.find(s => s.pinNumber == welcomeMessage.pinNumber && s.isConnected());
-                            
+
                             if (client) {
 
                                 client.sendMessage("api-ai-message", JSON.stringify(req.body))
@@ -160,17 +160,29 @@ export class WebhookServer {
 
             socket.on("pin", (message) => {
 
-                var client = new ConnectedClient(message, socket.id, socket);
+                var index = WebhookServer.connectedClients.findIndex(s => s.clientId == socket.id);
 
-                WebhookServer.connectedClients.push(client);
-                
-                socket.emit("pin-accepted", socket.id);
+                if (index == -1) {
+
+                    var client = new ConnectedClient(message, socket.id, socket);
+
+                    WebhookServer.connectedClients.push(client);
+
+                    socket.emit("pin-accepted", socket.id);
+
+                } else {
+
+                    var client = new ConnectedClient(message, socket.id, socket);
+
+                    WebhookServer.connectedClients[index] = client;
+                    
+                }
 
             })
 
             socket.on('disconnect', () => {
                 var index = WebhookServer.connectedClients.findIndex(s => s.clientId == socket.id);
-                if(index != -1) {
+                if (index != -1) {
                     WebhookServer.connectedClients.splice(index, 1);
                 }
             });
